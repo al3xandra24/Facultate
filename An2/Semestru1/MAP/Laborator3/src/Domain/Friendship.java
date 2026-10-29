@@ -1,73 +1,52 @@
 package Domain;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Friendship extends Entity<Long> {
-    private User firstfriend;
-    private User secondfriend;
+public class Friendship extends Entity<Tuple<Long, Long>> {
+    private LocalDateTime friendshipDate;
 
     /**
-     * Constructor for a new Friendship between two users
-     * @param fistfriend_ the first user
-     * @param secondfriend_ the second user
+     * Creates a friendship between two users
+     * @param firstfriend_ - the ID of the first user
+     * @param secondfriend_ - the ID of the second user
+     * @param friendshipDate_ - the date and time when the friendship started
      */
-    public Friendship(User fistfriend_, User secondfriend_) {
-        this.firstfriend = fistfriend_;
-        this.secondfriend = secondfriend_;
+    public Friendship(Long firstfriend_, Long secondfriend_, LocalDateTime friendshipDate_) {
+        setID(idOf(firstfriend_, secondfriend_));
+        this.friendshipDate = friendshipDate_;
     }
 
     /**
-     * Retrieves the first user of the friendship.
-     * @return the first user.
+     * Builds the ID of the friendship between two users, with the smaller ID first
+     * @param id1 - the ID of the first user
+     * @param id2 - the ID of the second user
+     * @return the tuple (min(id1, id2), max(id1, id2))
+     * @throws IllegalArgumentException if one of the IDs is null
      */
-    public User getFirstfriend() {
-        return firstfriend;
+    public static Tuple<Long, Long> idOf(Long id1, Long id2) {
+        if (id1 == null || id2 == null)
+            throw new IllegalArgumentException("User IDs must not be null");
+        return id1 <= id2 ? new Tuple<>(id1, id2) : new Tuple<>(id2, id1);
     }
 
     /**
-     * Retrieves the second user of the friendship.
-     * @return the second user.
+     * Retrieves the ID of the first user of friendship.
+     * @return the smaller of the two user IDs
      */
-    public User getSecondfriend() {
-        return secondfriend;
+    public Long getFirstfriend() {return getID().getLeft();
     }
 
     /**
-     * Sets the first user of the friendship.
-     * @param fistfriend_ the new first user
+     * Retrieves the ID of the second user of friendship.
+     * @return the bigger of the two user IDs
      */
-    public void setFirstfriend(User fistfriend_) {
-        this.firstfriend = fistfriend_;
-    }
+    public Long getSecondfriend() {
+        return getID().getRight();}
 
     /**
-     * Sets the second user of the friendship
-     * @param secondfriend_
+     * Retrieves the date and time when the friendship started.
+     * @return the date of the friendship
      */
-    public void setSecondfriend(User secondfriend_) {
-        this.secondfriend = secondfriend_;
-    }
-
-    /**
-     * Compares this friendship to the specified object.
-     * @param o   the reference object with which to compare.
-     * @return true if the objects represents the same friendship; false otherwise
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Friendship friendship = (Friendship) o;
-        return (Objects.equals(firstfriend, friendship.firstfriend) && Objects.equals(secondfriend, friendship.secondfriend)) ||
-                (Objects.equals(firstfriend, friendship.secondfriend) && Objects.equals(secondfriend, friendship.firstfriend));
-    }
-
-    /**
-     * Returns a hash code value for the friendship.
-     * @return the hash code value for this friendship
-     */
-    @Override
-    public int hashCode() {
-        return firstfriend.hashCode() + secondfriend.hashCode();
-    }
+    public LocalDateTime getFriendshipDate() {return friendshipDate;}
 }

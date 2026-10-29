@@ -8,6 +8,9 @@ import Service.CommunityService;
 import Service.FriendshipService;
 import Service.UserService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class UI {
@@ -51,6 +54,8 @@ public class UI {
             System.out.println("Service error: "+ex.getMessage());
         }catch (ValidationException ex){
             System.out.println("Validation error: "+ex.getMessage());
+        }catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void removeUser() {
@@ -66,6 +71,8 @@ public class UI {
                 System.out.println("Service error: "+ex.getMessage());}
         } catch (NumberFormatException ex) {
             System.out.println("UI error: You must enter only digits!");
+        }catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void addFriend() {
@@ -74,7 +81,10 @@ public class UI {
             Long id1 = Long.parseLong(scanner.nextLine());
             System.out.println("Enter the ID of the second user:");
             Long id2 = Long.parseLong(scanner.nextLine());
-            friendshipService.addFriendship(id1, id2);
+            System.out.println("Enter the date the friendship began:");
+            LocalDateTime date = LocalDateTime.parse(scanner.nextLine().trim(),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            friendshipService.addFriendship(id1, id2, date);
             System.out.println("Friendship successfully added!");
         } catch  (RepositoryExceptions ex) {
             System.out.println("Repository error: "+ex.getMessage());
@@ -85,6 +95,10 @@ public class UI {
         }
         catch  (NumberFormatException ex) {
             System.out.println("UI error: You must enter only digits!");
+        }catch(DateTimeParseException ex){
+            System.out.println("UI error: Invalid date format!Use the format YYYY-MM-DDTHH:mm");
+        }catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void removeFriend() {
@@ -101,28 +115,38 @@ public class UI {
             System.out.println("Service error: "+ex.getMessage());
         } catch (NumberFormatException ex) {
             System.out.println("UI error: You must enter only digits!");
+        }catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void displayAllUsers(){
+        try{
         Iterable<User> users=userService.getAllUser();
         boolean isEmpty=true;
         for(User user:users){
             System.out.println("ID: "+user.getID()+"| First Name: "+user.getFirstName()+"| Last Name: "+user.getLastName());
             isEmpty=false;
         }
-        if(isEmpty){
+        if(isEmpty) {
             System.out.println("No users found!");
+        }
+        }catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void displayAllFriendships() {
+        try{
         Iterable<Friendship> friendships=friendshipService.getAllFriendships();
         boolean isEmpty=true;
         for(Friendship friendship:friendships){
-            System.out.println("ID: "+friendship.getID()+"| ID friend1:" + friendship.getFirstfriend().getID()+"| ID friend2:" + friendship.getSecondfriend().getID());
+            System.out.println("ID: "+friendship.getID()+"| ID friend1:" + friendship.getFirstfriend()+"| ID friend2:" + friendship.getSecondfriend()+"| Friendship date:"+
+                    friendship.getFriendshipDate());
             isEmpty=false;
         }
         if(isEmpty){
             System.out.println("No friendships found!");
+        }}catch (UnsupportedOperationException ex){
+            System.out.println("UnsupportedOperation error: "+ex.getMessage());
         }
     }
     private void numberOfCommunities(){
